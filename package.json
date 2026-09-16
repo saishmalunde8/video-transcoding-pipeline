@@ -1,0 +1,11 @@
+{
+  "name": "video-transcoding-pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted video transcoding pipeline with an event-loop observability lab",
+  "engines": {
+    "node": "22.22.1"
+  },
+  "scripts": {},
+  "license": "UNLICENSED"
+}
