@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Self-hosted video transcoding pipeline with an event-loop observability lab",
+  "type": "module",
   "engines": {
     "node": "22.22.1"
   },
