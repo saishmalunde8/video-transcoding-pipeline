@@ -7,7 +7,12 @@
   "engines": {
     "node": "22.22.1"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "rm -rf dist && tsc",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsc --watch --preserveWatchOutput",
+    "start": "node dist/cli.js"
+  },
   "license": "UNLICENSED",
   "devDependencies": {
     "@types/node": "^22.20.3",
