@@ -54,7 +54,7 @@ const cases: Record<string, () => void | Promise<void>> = {
 const name = process.argv[2] ?? "";
 const run = cases[name];
 if (run === undefined) {
-  console.error(`usage: node dist/errors.js <${Object.keys(cases).join("|")}>`);
+  console.error(`usage: node dist/lab/errors.js <${Object.keys(cases).join("|")}>`);
   process.exit(2);
 }
 await run();

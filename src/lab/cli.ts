@@ -1,4 +1,4 @@
-import { parseFrameRate } from "./frame-rate.js";
+import { parseFrameRate } from "../frame-rate.js";
 
 const input = process.argv[2];
 if (input === undefined) {
