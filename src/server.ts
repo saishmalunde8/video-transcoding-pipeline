@@ -1,4 +1,8 @@
+import "dotenv/config";
 import Fastify from "fastify";
+import { loadConfigOrExit } from "./config.js";
+
+const config = loadConfigOrExit(process.env);
 
 const app = Fastify();
 
@@ -26,5 +30,5 @@ app.get<{ Querystring: JobsQuery }>("/jobs", async (request) => {
   return { status: request.query.status ?? "all" };
 });
 
-await app.listen({ port: 3000, host: "127.0.0.1" });
-console.log("listening on http://127.0.0.1:3000");
+await app.listen({ port: config.port, host: config.host });
+console.log(`listening on http://${config.host}:${config.port} (${config.nodeEnv})`);
