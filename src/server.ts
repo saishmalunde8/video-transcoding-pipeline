@@ -1,12 +1,28 @@
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import Fastify from "fastify";
 import { loadConfigOrExit } from "./config.js";
 
 const config = loadConfigOrExit(process.env);
 
-const app = Fastify();
+const app = Fastify({
+  logger: {
+    level: config.logLevel,
+    ...(config.nodeEnv === "development"
+      ? {
+          transport: {
+            target: "pino-pretty",
+            options: { colorize: true, translateTime: "HH:MM:ss", ignore: "pid,hostname" },
+          },
+        }
+      : {}),
+  },
+  genReqId: () => randomUUID(),
+  requestIdHeader: "x-request-id",
+});
 
-app.get("/", async () => {
+app.get("/", async (request) => {
+  request.log.info("handling the index route");
   return { message: "hello from fastify" };
 });
 
@@ -31,4 +47,4 @@ app.get<{ Querystring: JobsQuery }>("/jobs", async (request) => {
 });
 
 await app.listen({ port: config.port, host: config.host });
-console.log(`listening on http://${config.host}:${config.port} (${config.nodeEnv})`);
+app.log.info(`listening on http://${config.host}:${config.port} (${config.nodeEnv})`);

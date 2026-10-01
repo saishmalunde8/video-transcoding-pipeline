@@ -2,12 +2,18 @@ export interface Config {
   host: string;
   port: number;
   nodeEnv: "development" | "test" | "production";
+  logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
 }
 
 const NODE_ENVS = ["development", "test", "production"] as const;
+const LOG_LEVELS = ["trace", "debug", "info", "warn", "error", "fatal", "silent"] as const;
 
 function isKnownNodeEnv(value: string): value is (typeof NODE_ENVS)[number] {
   return (NODE_ENVS as readonly string[]).includes(value);
+}
+
+function isKnownLogLevel(value: string): value is (typeof LOG_LEVELS)[number] {
+  return (LOG_LEVELS as readonly string[]).includes(value);
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv): Config {
@@ -26,13 +32,23 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     errors.push(`NODE_ENV must be one of ${NODE_ENVS.join(", ")}, got "${rawNodeEnv}"`);
   }
 
+  const rawLogLevel = env.LOG_LEVEL ?? "info";
+  if (!isKnownLogLevel(rawLogLevel)) {
+    errors.push(`LOG_LEVEL must be one of ${LOG_LEVELS.join(", ")}, got "${rawLogLevel}"`);
+  }
+
   if (errors.length > 0) {
     throw new Error(errors.join("\n"));
   }
 
-  // Safe: validated by isKnownNodeEnv above, but the array-of-errors
-  // pattern doesn't let TypeScript narrow rawNodeEnv's type on its own.
-  return { host, port, nodeEnv: rawNodeEnv as (typeof NODE_ENVS)[number] };
+  // Safe: validated by the type guards above, but the array-of-errors
+  // pattern doesn't let TypeScript narrow these types on its own.
+  return {
+    host,
+    port,
+    nodeEnv: rawNodeEnv as (typeof NODE_ENVS)[number],
+    logLevel: rawLogLevel as (typeof LOG_LEVELS)[number],
+  };
 }
 
 export function loadConfigOrExit(env: NodeJS.ProcessEnv): Config {
