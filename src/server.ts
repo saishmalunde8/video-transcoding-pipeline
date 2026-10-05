@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { randomUUID } from "node:crypto";
-import Fastify from "fastify";
+import Fastify, { LogController } from "fastify";
 import { loadConfigOrExit } from "./config.js";
 
 const config = loadConfigOrExit(process.env);
@@ -19,6 +19,13 @@ const app = Fastify({
   },
   genReqId: () => randomUUID(),
   requestIdHeader: "x-request-id",
+  logController: new LogController({
+    disableRequestLogging: (request) => request.url.split("?")[0] === "/health",
+  }),
+});
+
+app.get("/health", async () => {
+  return { status: "ok", uptimeSeconds: Math.round(process.uptime()) };
 });
 
 app.get("/", async (request) => {
