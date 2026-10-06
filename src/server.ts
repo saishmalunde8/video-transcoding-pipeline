@@ -2,6 +2,7 @@ import "dotenv/config";
 import { randomUUID } from "node:crypto";
 import Fastify, { LogController } from "fastify";
 import { loadConfigOrExit } from "./config.js";
+import { registerErrorHandling } from "./error-handler.js";
 
 const config = loadConfigOrExit(process.env);
 
@@ -23,6 +24,8 @@ const app = Fastify({
     disableRequestLogging: (request) => request.url.split("?")[0] === "/health",
   }),
 });
+
+registerErrorHandling(app);
 
 app.get("/health", async () => {
   return { status: "ok", uptimeSeconds: Math.round(process.uptime()) };
