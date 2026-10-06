@@ -11,7 +11,10 @@
     "build": "rm -rf dist && tsc",
     "typecheck": "tsc --noEmit",
     "dev": "tsc --watch --preserveWatchOutput",
-    "start": "node dist/lab/cli.js"
+    "start": "node dist/server.js",
+    "start:watch": "node --watch dist/server.js",
+    "smoke": "bash scripts/smoke.sh",
+    "lab:cli": "node dist/lab/cli.js"
   },
   "license": "UNLICENSED",
   "devDependencies": {
