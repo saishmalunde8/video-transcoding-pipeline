@@ -3,6 +3,7 @@ export interface Config {
   port: number;
   nodeEnv: "development" | "test" | "production";
   logLevel: "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "silent";
+  shutdownTimeoutMs: number;
 }
 
 const NODE_ENVS = ["development", "test", "production"] as const;
@@ -37,6 +38,14 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     errors.push(`LOG_LEVEL must be one of ${LOG_LEVELS.join(", ")}, got "${rawLogLevel}"`);
   }
 
+  const rawShutdownTimeout = env.SHUTDOWN_TIMEOUT_MS ?? "8000";
+  const shutdownTimeoutMs = Number(rawShutdownTimeout);
+  if (!Number.isInteger(shutdownTimeoutMs) || shutdownTimeoutMs < 1) {
+    errors.push(
+      `SHUTDOWN_TIMEOUT_MS must be a positive integer (milliseconds), got "${rawShutdownTimeout}"`,
+    );
+  }
+
   if (errors.length > 0) {
     throw new Error(errors.join("\n"));
   }
@@ -48,6 +57,7 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     port,
     nodeEnv: rawNodeEnv as (typeof NODE_ENVS)[number],
     logLevel: rawLogLevel as (typeof LOG_LEVELS)[number],
+    shutdownTimeoutMs,
   };
 }
 

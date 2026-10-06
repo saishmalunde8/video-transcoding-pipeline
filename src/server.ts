@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import Fastify, { LogController } from "fastify";
 import { loadConfigOrExit } from "./config.js";
 import { registerErrorHandling } from "./error-handler.js";
+import { installGracefulShutdown } from "./shutdown.js";
 
 const config = loadConfigOrExit(process.env);
 
@@ -26,6 +27,7 @@ const app = Fastify({
 });
 
 registerErrorHandling(app);
+installGracefulShutdown(app, config.shutdownTimeoutMs);
 
 app.get("/health", async () => {
   return { status: "ok", uptimeSeconds: Math.round(process.uptime()) };
@@ -56,5 +58,10 @@ app.get<{ Querystring: JobsQuery }>("/jobs", async (request) => {
   return { status: request.query.status ?? "all" };
 });
 
-await app.listen({ port: config.port, host: config.host });
+try {
+  await app.listen({ port: config.port, host: config.host });
+} catch (e) {
+  app.log.error({ err: e }, "failed to start");
+  process.exit(1);
+}
 app.log.info(`listening on http://${config.host}:${config.port} (${config.nodeEnv})`);
